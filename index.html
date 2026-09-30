@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header><h1>📚 Library Management System</h1></header>
+<nav>
+    <a href="/">Dashboard</a>
+    <a href="/books.html">Books</a>
+    <a href="/members.html">Members</a>
+    <a href="/issue.html">Issue / Return</a>
+</nav>
+<main>
+    <h2>Dashboard</h2>
+    <div class="cards">
+        <div class="card"><b th:text="${bookCount}">0</b><span>Books</span></div>
+        <div class="card"><b th:text="${memberCount}">0</b><span>Members</span></div>
+        <div class="card"><b th:text="${transactionCount}">0</b><span>Total Transactions</span></div>
+        <div class="card"><b th:text="${issuedCount}">0</b><span>Currently Issued</span></div>
+    </div>
+    <section class="info">
+        <h3>Welcome</h3>
+        <p>Use the navigation menu to manage books, members, and book issue/return transactions.</p>
+    </section>
+</main>
+</body>
+</html>

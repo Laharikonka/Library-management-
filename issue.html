@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Issue / Return</title><link rel="stylesheet" href="/css/style.css"></head>
+<body><header><h1>🔄 Issue / Return Books</h1></header><nav><a href="/">Dashboard</a><a href="/books.html">Books</a><a href="/members.html">Members</a><a href="/issue.html">Issue / Return</a></nav>
+<main>
+<section class="panel"><h2>Issue Book</h2><select id="book"></select><select id="member"></select><input id="due" type="date"><button onclick="issueBook()">Issue</button></section>
+<h2>Transactions</h2><table><thead><tr><th>Book</th><th>Member</th><th>Issue Date</th><th>Due Date</th><th>Return Date</th><th>Status</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table>
+</main>
+<script>
+async function loadOptions(){const [br,mr]=await Promise.all([fetch('/api/books'),fetch('/api/members')]);const bs=await br.json(),ms=await mr.json();book.innerHTML=bs.filter(b=>b.availableQuantity>0).map(b=>`<option value="${b.id}">${b.title} (${b.availableQuantity} available)</option>`).join('');member.innerHTML=ms.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');}
+async function load(){const r=await fetch('/api/transactions');const d=await r.json();rows.innerHTML=d.map(t=>`<tr><td>${t.book.title}</td><td>${t.member.name}</td><td>${t.issueDate}</td><td>${t.dueDate}</td><td>${t.returnDate||'-'}</td><td>${t.status}</td><td>${t.status==='ISSUED'?`<button onclick="ret(${t.id})">Return</button>`:'-'}</td></tr>`).join('');}
+async function issueBook(){if(!due.value){alert('Select due date');return;}const r=await fetch(`/api/transactions/issue?bookId=${book.value}&memberId=${member.value}&dueDate=${due.value}`,{method:'POST'});if(!r.ok)alert(await r.text());else{await loadOptions();load();}}
+async function ret(i){const r=await fetch('/api/transactions/'+i+'/return',{method:'PUT'});if(!r.ok)alert(await r.text());else{loadOptions();load();}}
+loadOptions();load();
+</script></body></html>

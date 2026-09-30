@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Members</title><link rel="stylesheet" href="/css/style.css"></head>
+<body><header><h1>👥 Members</h1></header><nav><a href="/">Dashboard</a><a href="/books.html">Books</a><a href="/members.html">Members</a><a href="/issue.html">Issue / Return</a></nav>
+<main>
+<form id="memberForm"><input type="hidden" id="id"><input id="name" placeholder="Name" required><input id="email" type="email" placeholder="Email" required><input id="phone" placeholder="Phone"><input id="address" placeholder="Address"><button>Save Member</button><button type="button" onclick="resetForm()">Clear</button></form>
+<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Address</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table>
+</main>
+<script>
+async function load(){const r=await fetch('/api/members');const d=await r.json();rows.innerHTML=d.map(m=>`<tr><td>${m.name}</td><td>${m.email}</td><td>${m.phone||''}</td><td>${m.address||''}</td><td><button onclick='edit(${JSON.stringify(m)})'>Edit</button> <button onclick='del(${m.id})'>Delete</button></td></tr>`).join('');}
+function edit(m){id.value=m.id;name.value=m.name;email.value=m.email;phone.value=m.phone||'';address.value=m.address||'';}
+function resetForm(){memberForm.reset();id.value='';}
+memberForm.onsubmit=async e=>{e.preventDefault();const body={name:name.value,email:email.value,phone:phone.value,address:address.value};const method=id.value?'PUT':'POST';const url=id.value?'/api/members/'+id.value:'/api/members';const r=await fetch(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)alert(await r.text());else{resetForm();load();}};
+async function del(i){if(confirm('Delete this member?')){await fetch('/api/members/'+i,{method:'DELETE'});load();}}
+load();
+</script></body></html>

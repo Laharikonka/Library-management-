@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Books</title><link rel="stylesheet" href="/css/style.css"></head>
+<body><header><h1>📚 Books</h1></header><nav><a href="/">Dashboard</a><a href="/books.html">Books</a><a href="/members.html">Members</a><a href="/issue.html">Issue / Return</a></nav>
+<main>
+<div class="toolbar"><input id="search" placeholder="Search title or author"><button onclick="loadBooks()">Search</button></div>
+<form id="bookForm">
+<input type="hidden" id="id"><input id="title" placeholder="Title" required><input id="author" placeholder="Author" required>
+<input id="isbn" placeholder="ISBN" required><input id="category" placeholder="Category"><input id="quantity" type="number" min="1" placeholder="Quantity" required>
+<button>Save Book</button><button type="button" onclick="resetForm()">Clear</button>
+</form>
+<table><thead><tr><th>Title</th><th>Author</th><th>ISBN</th><th>Category</th><th>Qty</th><th>Available</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table>
+</main>
+<script>
+async function loadBooks(){const q=document.getElementById('search').value; const r=await fetch('/api/books?q='+encodeURIComponent(q)); const data=await r.json();
+rows.innerHTML=data.map(b=>`<tr><td>${b.title}</td><td>${b.author}</td><td>${b.isbn}</td><td>${b.category||''}</td><td>${b.quantity}</td><td>${b.availableQuantity}</td><td><button onclick='editBook(${JSON.stringify(b)})'>Edit</button> <button onclick='deleteBook(${b.id})'>Delete</button></td></tr>`).join('');}
+function editBook(b){id.value=b.id;title.value=b.title;author.value=b.author;isbn.value=b.isbn;category.value=b.category||'';quantity.value=b.quantity;}
+function resetForm(){bookForm.reset();id.value='';}
+bookForm.onsubmit=async e=>{e.preventDefault();const body={title:title.value,author:author.value,isbn:isbn.value,category:category.value,quantity:+quantity.value,availableQuantity:+quantity.value};const method=id.value?'PUT':'POST';const url=id.value?'/api/books/'+id.value:'/api/books';const r=await fetch(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)alert(await r.text());else{resetForm();loadBooks();}};
+async function deleteBook(i){if(confirm('Delete this book?')){await fetch('/api/books/'+i,{method:'DELETE'});loadBooks();}}
+loadBooks();
+</script></body></html>
